@@ -36,14 +36,17 @@ h1{font-size:17px;margin:0;font-weight:700}
 #vid{position:absolute;z-index:1;object-fit:cover;pointer-events:none;background:#000}
 #vid[hidden],#ring[hidden],#hd[hidden]{display:none}
 #ring{position:absolute;z-index:2;border:3px solid var(--hi);pointer-events:none}
+#ring.grid{--gl:linear-gradient(rgba(255,255,255,.75),rgba(255,255,255,.75));background:var(--gl) 33.333% 0/1px 100% no-repeat,var(--gl) 66.666% 0/1px 100% no-repeat,var(--gl) 0 33.333%/100% 1px no-repeat,var(--gl) 0 66.666%/100% 1px no-repeat}
 #hd{position:absolute;z-index:4;width:36px;height:36px;background:var(--hi);border-radius:10px 0 0 0;touch-action:none}
 #hd::after{content:"";position:absolute;right:8px;bottom:8px;width:12px;height:12px;border-right:3px solid #fff;border-bottom:3px solid #fff}
 .txt{position:absolute;white-space:pre;text-align:center;line-height:1.2}
 textarea,select{font:400 16px "Noto Sans Thai",sans-serif;padding:5px 8px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);width:100%}
-.frow{display:flex;gap:8px;align-items:center}.frow+.frow{margin-top:8px}.frow .fl{flex:0 0 36px;font-weight:700;font-size:12.5px}.frow input{flex:1;min-width:0}.frow select{flex:0 0 96px;width:96px}
+.frow{display:flex;gap:8px;align-items:center}.frow+.frow{margin-top:8px}.frow .fl{flex:0 0 48px;font-weight:700;font-size:12.5px}.frow input{flex:1;min-width:0}.frow select{flex:1;width:auto;min-width:0}
 .pgrid{display:grid;grid-template-columns:repeat(3,28px);gap:3px}.pos{width:28px;height:28px;padding:0}
 .txt.bgp{background:rgba(0,0,0,.65);padding:.25em .5em;border-radius:.35em}
 .txt.sel{outline:3px solid var(--hi);outline-offset:3px}
+#qe{display:flex;gap:6px;align-items:flex-end;margin-top:6px}#qe label{min-width:0}#qe input,#qe textarea{width:100%;min-width:0}#qe .b{flex:0 0 auto}
+#camSum{font-weight:400;color:var(--mute);font-size:11.5px;margin-left:6px}
 .hint{color:var(--mute);font-size:11.5px;margin:4px 0 0;text-align:center}
 .chips{display:flex;gap:6px;overflow-x:auto;padding:8px 0 2px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
@@ -66,10 +69,6 @@ input[type=range]{width:100%}
 .bar .l{justify-self:start}.bar .r{justify-self:end}
 #shutter{width:54px;height:54px;border-radius:50%;border:4px solid var(--acc);background:var(--panel);box-shadow:inset 0 0 0 4px var(--acc)}
 #shutter:active{transform:scale(.94)}
-#modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px}
-#modal[hidden]{display:none}
-#modal img{max-width:100%;max-height:68vh;border-radius:6px}
-#modal p{color:#fff;margin:0;text-align:center;font-size:14px}
 #toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:#16222B;color:#fff;padding:9px 14px;border-radius:999px;font-size:14px;z-index:40;opacity:0;transition:opacity .2s;pointer-events:none}
 #toast.on{opacity:1}
 </style>
@@ -83,16 +82,21 @@ input[type=range]{width:100%}
     <div id="tl" class="layer"></div>
     <div id="hd" data-k="h" hidden></div>
   </div></div>
-  <div class="srow"><span id="status">กำลังเปิดกล้อง…</span><button class="b" id="album">อัลบั้ม</button><button class="b" id="lockBtn">ล็อกกรอบ</button><button class="b bad" id="clearAll">ล้างรูปทั้งหมด</button></div></div>
+  <div class="srow"><span id="status">กำลังเปิดกล้อง…</span><button class="b" id="album">อัลบั้ม</button><button class="b" id="lockBtn">ล็อกกรอบ</button><button class="b bad" id="clearAll">ล้างรูปทั้งหมด</button></div><div id="qe" hidden></div></div>
+<details class="card" id="camTools"><summary>เครื่องมือกล้อง <span id="camSum"></span></summary>
+  <div class="row" style="margin-top:8px"><button class="b" id="gridBtn">เส้นกริด</button><button class="b" id="torchBtn" hidden>แฟลช</button></div>
   <div class="chips" id="camChips" hidden></div>
   <div class="row" id="zoomRow" hidden><label>ซูม <b id="zv"></b><input type="range" id="zoom"></label></div>
   <p class="hint" id="camInfo"></p>
+</details>
   <div class="chips" id="chips"></div>
   <div class="card"><h2>ข้อมูลสินค้า (ขึ้นบนรูป)</h2><div id="fl"></div></div>
   <div class="card" id="sel"></div>
   <details class="card"><summary>ตั้งค่าเพิ่มเติม</summary>
     <div class="row" style="margin-top:10px"><label>ระยะห่างระหว่างช่อง<input type="range" id="gap" min="0" max="6" step="0.2"></label>
     <label style="flex:0 0 auto;min-width:0">สีพื้น<input type="color" id="bg"></label></div>
+    <div class="row" style="margin-top:10px"><label>โปรไฟล์ร้าน (เลย์เอาต์ + ข้อความ + สไตล์)<select id="prof"></select></label></div>
+    <div class="row"><button class="b" id="profLoad">ใช้โปรไฟล์</button><button class="b" id="profSave">บันทึกเป็นโปรไฟล์</button><button class="b bad" id="profDel">ลบ</button></div>
     
   </details>
 </div>
@@ -105,15 +109,11 @@ input[type=range]{width:100%}
 
 <input type="file" id="fileCam" accept="image/*" capture="environment" hidden>
 <input type="file" id="fileAlb" accept="image/*" hidden>
-<div id="modal" hidden>
-  <img id="outImg" alt="รูปที่สร้างเสร็จ">
-  <p>กดค้างที่รูปเพื่อบันทึกลงเครื่อง</p>
-  <div class="row"><button class="b pri" id="shareBtn">แชร์ / บันทึก</button><button class="b" id="closeModal">ปิด</button></div>
-</div>
 <div id="toast"></div>
 
 <script>
 const $=s=>document.querySelector(s),stage=$('#stage'),cl=$('#cl'),tl=$('#tl'),vid=$('#vid'),ring=$('#ring'),hd=$('#hd');
+const qe=$('#qe');
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 let uid=1;
@@ -130,24 +130,26 @@ const TXT_DEF={text:'ราคา 199฿',x:50,y:5,ax:.5,ay:0,size:8,color:'#fff
 function rgba(h,a){const n=parseInt(h.slice(1),16);return 'rgba('+(n>>16)+','+((n>>8)&255)+','+(n&255)+','+a+')'}
 function contrast(h){const n=parseInt(h.slice(1),16),l=.299*(n>>16)+.587*((n>>8)&255)+.114*(n&255);return l>140?'#000000':'#ffffff'}
 const FIELDS=[['chest','อก','อก '],['length','ยาว','ยาว '],['code','รหัส','']];
-const FIELD_DEF={chest:{ax:0,ay:0,x:4,y:5,bgc:'#16222B'},length:{ax:1,ay:0,x:96,y:5,bgc:'#16222B'},code:{ax:0,ay:1,x:4,y:95,bgc:'#e8431a'}};
 const POSN=['ซ้ายบน','กลางบน','ขวาบน','ซ้ายกลาง','กลาง','ขวากลาง','ซ้ายล่าง','กลางล่าง','ขวาล่าง'];
-const fieldText=o=>(FIELDS.find(f=>f[0]===o.field)[2])+o.val;
-function ensureFields(){FIELDS.forEach(f=>{if(!S.texts.some(t=>t.field===f[0]))S.texts.push(normText({field:f[0],val:'',size:7,...FIELD_DEF[f[0]]}))})}
+const lineList=o=>FIELDS.map(f=>(o[f[0]]||'').trim()?f[2]+o[f[0]].trim():'').filter(Boolean);
+const txtOf=o=>o.group?lineList(o).join('\n'):o.text;
+const grp=()=>S.texts.find(t=>t.group);
+const GRP_NEW=()=>({group:true,chest:'',length:'',code:'',size:7,x:4,y:5,ax:0,ay:0,bgc:'#16222B'});
+function setPos(o,i){const c=i%3,w=Math.floor(i/3);o.ax=c/2;o.ay=w/2;o.x=[4,50,96][c];o.y=[5,50,95][w]}
+function ensureFields(){if(!grp())S.texts.push(normText(GRP_NEW()))}
 function renderFields(){
-  $('#fl').innerHTML=FIELDS.map(f=>{const o=S.texts.find(t=>t.field===f[0]),pi=Math.round(o.ay*2)*3+Math.round(o.ax*2);
-    return '<div class="frow"><span class="fl">'+f[1]+'</span><input type="text" data-f="'+f[0]+'" value="'+esc(o.val)+'" placeholder="'+(f[0]==='code'?'เช่น A12':'เช่น 38')+'"><select data-p="'+f[0]+'">'+POSN.map((n,i)=>'<option value="'+i+'"'+(i===pi?' selected':'')+'>'+n+'</option>').join('')+'</select></div>'}).join('');
+  const o=grp(),pi=Math.round(o.ay*2)*3+Math.round(o.ax*2);
+  $('#fl').innerHTML=FIELDS.map(f=>'<div class="frow"><span class="fl">'+f[1]+'</span><input type="text" data-f="'+f[0]+'" value="'+esc(o[f[0]]||'')+'" placeholder="'+(f[0]==='code'?'เช่น A12':'เช่น 38')+'"></div>').join('')+
+    '<div class="frow"><span class="fl">ตำแหน่ง</span><select data-p="1">'+POSN.map((n,i)=>'<option value="'+i+'"'+(i===pi?' selected':'')+'>'+n+'</option>').join('')+'</select></div>';
 }
-$('#fl').addEventListener('input',e=>{const k=e.target.dataset.f;if(!k)return;const o=S.texts.find(t=>t.field===k);o.val=e.target.value;place(o);save()});
-$('#fl').addEventListener('change',e=>{
-  const k=e.target.dataset.p;if(!k)return;const o=S.texts.find(t=>t.field===k),i=+e.target.value,c=i%3,w=Math.floor(i/3);
-  o.ax=c/2;o.ay=w/2;o.x=[4,50,96][c];o.y=[5,50,95][w];place(o);save();if(S.sel&&S.sel.id===o.id)renderSel();
-});
+$('#fl').addEventListener('input',e=>{const k=e.target.dataset.f;if(!k)return;const o=grp();o[k]=e.target.value;place(o);
+  const q=qe.querySelector('[data-q="'+k+'"]');if(q&&q!==document.activeElement)q.value=o[k];save()});
+$('#fl').addEventListener('change',e=>{if(!e.target.dataset.p)return;const o=grp();setPos(o,+e.target.value);place(o);save();if(S.sel&&S.sel.id===o.id)renderSel()});
 function normText(t){const lg=t.ax===undefined;return {...TXT_DEF,...t,ax:lg?.5:t.ax,ay:lg?.5:t.ay,id:uid++}}
-const mk=(r,old)=>({id:uid++,x:r[0],y:r[1],w:r[2],h:r[3],label:old?old.label:'',url:old?old.url:null,img:old?old.img:null});
+const mk=(r,old)=>({id:uid++,x:r[0],y:r[1],w:r[2],h:r[3],label:old?old.label:'',url:old?old.url:null,img:old?old.img:null,blob:old?old.blob:null});
 const cellById=id=>S.cells.find(c=>c.id===id);
 const find=(k,id)=>(k==='c'?S.cells:S.texts).find(o=>o.id===id);
-function applyPreset(i){S.cells=PRESETS[i][1].map((r,k)=>mk(r,S.cells[k]));S.act=S.cells[0].id;S.sel={k:'c',id:S.act};build();save()}
+function applyPreset(i){S.cells=PRESETS[i][1].map((r,k)=>mk(r,S.cells[k]));S.act=S.cells[0].id;S.sel={k:'c',id:S.act};build();save();saveImgs()}
 
 /* ---------- stage ---------- */
 const els={};
@@ -180,7 +182,7 @@ function place(o){
     Object.assign(d.style,{left:o.x+'%',top:o.y+'%',fontSize:fs+'px',color:o.color,fontFamily:'"'+F[0]+'",sans-serif',fontWeight:F[1],
       transform:'translate('+(-o.ax*100)+'%,'+(-o.ay*100)+'%)',background:o.bg?rgba(o.bgc,o.bga):'none',
       padding:o.bg?'.25em .5em':'0',borderRadius:o.bg?'.35em':'0',webkitTextStroke:o.stroke?(fs*.14)+'px '+contrast(o.color):'0'});
-    d.style.paintOrder='stroke fill';d.textContent=o.field?fieldText(o):o.text;d.style.display=(o.field&&!o.val)?'none':'';
+    d.style.paintOrder='stroke fill';const tx=txtOf(o);d.textContent=tx;d.style.display=(o.group&&!tx)?'none':'';d.style.textAlign=o.group?(o.ax===0?'left':o.ax===1?'right':'center'):'center';
   }
 }
 function placeAll(){
@@ -194,7 +196,7 @@ function overlay(){
   for(const k in els)if(k[0]==='t')els[k].classList.toggle('sel',!!S.sel&&S.sel.k==='t'&&'t'+S.sel.id===k);
   if(!c){vid.hidden=true;ring.hidden=true;hd.hidden=true;return}
   const L=c.x/100*P+g,T=c.y/100*P+g,W=c.w/100*P-2*g,H=c.h/100*P-2*g;
-  Object.assign(ring.style,{left:L+'px',top:T+'px',width:W+'px',height:H+'px'});ring.hidden=false;
+  Object.assign(ring.style,{left:L+'px',top:T+'px',width:W+'px',height:H+'px'});ring.hidden=false;ring.classList.toggle('grid',gridOn&&!!stream);
   Object.assign(vid.style,{left:L+'px',top:T+'px',width:W+'px',height:H+'px'});vid.hidden=!stream;
   const showH=!S.lock&&S.sel&&S.sel.k==='c';
   hd.hidden=!showH;
@@ -245,29 +247,46 @@ function choose(k,id,keep){
     if(!keep&&S.act===id&&S.sel&&S.sel.k==='c'&&S.sel.id===id){S.act=null;S.sel=null}   // แตะซ้ำ = ปิดกล้อง ดูภาพรวม
     else{S.act=id;S.sel={k:'c',id}}
     if(S.act&&!stream)startCam();
-  }else S.sel={k:'t',id};
+  }else{S.sel={k:'t',id};if(!keep)openQE(find('t',id))}
   renderSel();overlay();status();
 }
+/* ---------- quick edit on screen ---------- */
+function openQE(o){
+  if(!o)return;
+  qe.hidden=false;qe.dataset.id=o.id;
+  qe.innerHTML=(o.group?FIELDS.map(f=>'<label>'+f[1]+'<input type="text" data-q="'+f[0]+'" value="'+esc(o[f[0]]||'')+'"></label>').join(''):'<label>ข้อความบนรูป<textarea data-q="text" rows="2">'+esc(o.text)+'</textarea></label>')+'<button class="b pri" data-done>เสร็จ</button>';
+  const f=qe.querySelector('input,textarea');setTimeout(()=>{f.focus();if(f.select)f.select()},0);
+}
+function closeQE(){if(qe.contains(document.activeElement))document.activeElement.blur();qe.hidden=true;qe.innerHTML='';qe.dataset.id=''}
+qe.addEventListener('input',e=>{
+  const k=e.target.dataset.q;if(!k)return;const o=find('t',+qe.dataset.id);if(!o)return;
+  o[k]=e.target.value;place(o);
+  if(o.group){const i=$('#fl [data-f="'+k+'"]');if(i)i.value=o[k]}
+  else{const t=$('#tx');if(t)t.value=o.text}
+  save();
+});
+qe.addEventListener('click',e=>{if(e.target.closest('[data-done]'))closeQE()});
 
 /* ---------- panel ---------- */
 function renderSel(){
   const p=$('#sel'),o=S.sel&&find(S.sel.k,S.sel.id);
+  if(qe.dataset.id&&!(S.sel&&S.sel.k==='t'&&String(S.sel.id)===qe.dataset.id))closeQE();
   if(!o){p.innerHTML='<p class="hint" style="margin:0">แตะช่องเพื่อเลือกถ่าย · ลากเพื่อย้าย · ลากมุมส้มเพื่อขยาย</p>';return}
   if(S.sel.k==='c'){
     p.innerHTML='<div class="row"><label>ข้อความบนช่อง (เช่น ตำหนิ, ด้านหลัง)<input type="text" id="lb" value="'+esc(o.label)+'"></label></div><div class="row">'+(o.img?'<button class="b" id="clr">ล้างรูปช่องนี้</button>':'')+'<button class="b bad" id="del">ลบช่องนี้</button></div>';
     $('#lb').oninput=e=>{o.label=e.target.value;place(o);save()};
-    if(o.img)$('#clr').onclick=()=>{o.img=null;o.url=null;place(o);renderSel()};
-    $('#del').onclick=()=>{S.cells=S.cells.filter(c=>c!==o);S.sel=null;if(S.act===o.id)S.act=null;build();save()};
+    if(o.img)$('#clr').onclick=()=>{if(o.url)URL.revokeObjectURL(o.url);o.img=null;o.url=null;o.blob=null;place(o);renderSel();status();saveImgs()};
+    $('#del').onclick=()=>{S.cells=S.cells.filter(c=>c!==o);S.sel=null;if(S.act===o.id)S.act=null;build();save();saveImgs()};
   }else{
     const grid=[0,1,2,3,4,5,6,7,8].map(i=>'<button class="b pos'+(o.ax===(i%3)/2&&o.ay===Math.floor(i/3)/2?' on':'')+'" data-a="'+i+'"></button>').join('');
-    p.innerHTML=(o.field?'<p class="hint" style="text-align:left;margin:0">'+FIELDS.find(f=>f[0]===o.field)[1]+' · แก้ค่าได้ที่ช่องข้อมูลสินค้า ตรงนี้ปรับรูปแบบ</p>':'<div class="row"><label>ข้อความบนรูป (ขึ้นบรรทัดใหม่ได้)<textarea id="tx" rows="2">'+esc(o.text)+'</textarea></label></div>')+
+    p.innerHTML=(o.group?'<p class="hint" style="text-align:left;margin:0">ข้อมูลสินค้า (อก · ยาว · รหัส) เรียงต่อกันเป็นกลุ่มเดียว · แก้ค่าได้ที่ช่องข้อมูลสินค้าหรือแตะข้อความบนรูป ตรงนี้ปรับรูปแบบและตำแหน่ง</p>':'<div class="row"><label>ข้อความบนรูป (ขึ้นบรรทัดใหม่ได้)<textarea id="tx" rows="2">'+esc(o.text)+'</textarea></label></div>')+
     '<div class="row"><div><div class="hint" style="text-align:left;margin:0 0 4px">ตำแหน่ง</div><div class="pgrid">'+grid+'</div></div>'+
     '<label style="min-width:150px">ฟอนต์<select id="fn">'+FONTS.map((f,i)=>'<option value="'+i+'"'+(i===o.font?' selected':'')+'>'+f[2]+'</option>').join('')+'</select></label></div>'+
     '<div class="row"><label>ขนาด<input type="range" id="sz" min="3" max="20" step="0.5" value="'+o.size+'"></label><label style="flex:0 0 auto;min-width:0">สีอักษร<input type="color" id="co" value="'+o.color+'"></label></div>'+
     '<div class="row"><label style="flex-direction:row;align-items:center;gap:8px;flex:0 0 auto;min-width:0"><input type="checkbox" id="bgc"'+(o.bg?' checked':'')+'>พื้นหลัง</label><input type="color" id="bgcol" value="'+o.bgc+'"><label style="min-width:90px"><input type="range" id="bga" min="0.2" max="1" step="0.05" value="'+o.bga+'"></label></div>'+
-    '<div class="row"><label style="flex-direction:row;align-items:center;gap:8px;flex:0 0 auto;min-width:0"><input type="checkbox" id="stk"'+(o.stroke?' checked':'')+'>ขอบตัวอักษร</label>'+(o.field?'':'<button class="b bad" id="del" style="margin-left:auto">ลบข้อความ</button>')+'</div>';
-    p.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const i=+b.dataset.a,c=i%3,w=Math.floor(i/3);o.ax=c/2;o.ay=w/2;o.x=[4,50,96][c];o.y=[5,50,95][w];place(o);save();renderSel()});
-    if($('#tx'))$('#tx').oninput=e=>{o.text=e.target.value;place(o);save()};
+    '<div class="row"><label style="flex-direction:row;align-items:center;gap:8px;flex:0 0 auto;min-width:0"><input type="checkbox" id="stk"'+(o.stroke?' checked':'')+'>ขอบตัวอักษร</label>'+(o.group?'':'<button class="b bad" id="del" style="margin-left:auto">ลบข้อความ</button>')+'</div>';
+    p.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{setPos(o,+b.dataset.a);place(o);save();renderSel();if(o.group)renderFields()});
+    if($('#tx'))$('#tx').oninput=e=>{o.text=e.target.value;place(o);const q=qe.querySelector('[data-q="text"]');if(q&&q!==document.activeElement)q.value=o.text;save()};
     $('#fn').onchange=e=>{o.font=+e.target.value;place(o);save()};
     $('#sz').oninput=e=>{o.size=+e.target.value;place(o);save()};
     $('#co').oninput=e=>{o.color=e.target.value;place(o);save()};
@@ -281,14 +300,21 @@ function renderSel(){
 $('#chips').innerHTML=PRESETS.map((p,i)=>'<button class="b" data-p="'+i+'">'+p[0]+'</button>').join('')+'<button class="b" id="addCell">+ ช่อง</button><button class="b" id="addTxt">+ ข้อความ</button>';
 $('#chips').onclick=e=>{const b=e.target.closest('[data-p]');if(b)applyPreset(+b.dataset.p)};
 $('#addCell').onclick=()=>{const c=mk([30,30,40,40]);S.cells.push(c);S.act=c.id;S.sel={k:'c',id:c.id};build();save();startCam()};
-$('#addTxt').onclick=()=>{const t=normText({});S.texts.push(t);S.sel={k:'t',id:t.id};build();save();$('#sel').scrollIntoView({behavior:'smooth',block:'nearest'})};
+$('#addTxt').onclick=()=>{const t=normText({});S.texts.push(t);S.sel={k:'t',id:t.id};build();save();openQE(t)};
 $('#lockBtn').onclick=()=>{S.lock=!S.lock;$('#lockBtn').textContent=S.lock?'ปลดล็อกกรอบ':'ล็อกกรอบ';$('#lockBtn').classList.toggle('on',S.lock);overlay();save()};
 $('#gap').oninput=e=>{S.gap=+e.target.value;placeAll();save()};
 $('#bg').oninput=e=>{S.bg=e.target.value;stage.style.background=S.bg;save()};
-$('#clearAll').onclick=()=>{S.cells.forEach(c=>{c.img=null;c.url=null;place(c)});renderSel()};
+$('#clearAll').onclick=()=>{
+  if(!S.cells.some(c=>c.img))return;
+  if(!confirm('ล้างรูปทั้งหมดใช่ไหม?'))return;
+  S.cells.forEach(c=>{if(c.url)URL.revokeObjectURL(c.url);c.img=null;c.url=null;c.blob=null;place(c)});saveImgs();
+  S.act=S.cells[0]?S.cells[0].id:null;S.sel=S.act?{k:'c',id:S.act}:null;
+  renderSel();overlay();status();if(S.act&&!stream)startCam();
+};
 
 /* ---------- camera lives inside the chosen cell ---------- */
 let stream=null,facing='environment',starting=false,camId=null,cams=[];
+let gridOn=false,torchOn=false;try{gridOn=localStorage.getItem('shopeeGrid')==='1'}catch(e){}
 function status(){
   const n=S.cells.filter(c=>c.img).length,t=S.cells.length;
   let m=n+'/'+t+' ช่อง · ';
@@ -303,7 +329,7 @@ async function startCam(){
     const base={width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30}};
     stream=await navigator.mediaDevices.getUserMedia({video:camId?{...base,deviceId:{exact:camId}}:{...base,facingMode:{ideal:facing}},audio:false});
     vid.srcObject=stream;await vid.play();
-    await listCams();setupZoom();
+    await listCams();setupZoom();setupTorch();
   }catch(err){
     stream=null;
     $('#camInfo').textContent='เปิดกล้องในแอปไม่สำเร็จ'+(err&&err.name?' ('+err.name+')':'')+' · ตรวจว่าอนุญาตกล้องให้เว็บนี้แล้ว';
@@ -312,20 +338,28 @@ async function startCam(){
   starting=false;overlay();status();
 }
 async function listCams(){
-  try{cams=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput'&&!/front|user|facetime|selfie/i.test(d.label||''))}catch(e){cams=[]}
   const t=stream&&stream.getVideoTracks()[0],st=t&&t.getSettings?t.getSettings():{};
   if(st.deviceId)camId=st.deviceId;
+  try{
+    const rear=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput'&&d.deviceId&&!/front|user|facetime|selfie|depth|infrared|\bir\b|tof|desk/i.test(d.label||''));
+    let real=rear.filter(d=>!/dual|triple|quad/i.test(d.label||''));if(!real.length)real=rear;
+    const seen=new Set();real=real.filter(d=>!seen.has(d.deviceId)&&seen.add(d.deviceId));
+    cams=real.slice(0,3);
+    const cur=real.find(d=>d.deviceId===camId);if(cur&&!cams.includes(cur))cams[2]=cur;
+  }catch(e){cams=[]}
   renderCams();
 }
 function camName(d,n){
   const l=(d.label||'').toLowerCase();
   if(/ultra/.test(l))return 'มุมกว้างพิเศษ';
   if(/tele/.test(l))return 'เทเล';
+  if(/^back camera$|main|\bwide\b/.test(l))return 'กล้องหลัก';
   return 'กล้องหลัง '+n;
 }
 function renderCams(){
   const box=$('#camChips');
-  $('#camInfo').textContent='เครื่องแจ้งกล้องหลัง '+cams.length+' ตัว'+(cams.length?': '+cams.map(d=>d.label||'ไม่มีชื่อ').join(' | '):'')+(cams.length<3?' · ถ้าไม่ครบ ลองแถบซูม หรือเปิดด้วย Chrome':'');
+  $('#camInfo').textContent='กล้องหลัง '+cams.length+' ตัว'+(cams.length?': '+cams.map(d=>d.label||'ไม่มีชื่อ').join(' | '):'')+(cams.length<3?' · ถ้าไม่ครบ ลองแถบซูม หรือเปิดด้วย Chrome':'');
+  camSum();
   if(cams.length<2){box.hidden=true;return}
   box.innerHTML=cams.map((d,i)=>'<button class="b'+(d.deviceId===camId?' on':'')+'" data-i="'+i+'">'+camName(d,i+1)+'</button>').join('');
   box.hidden=false;
@@ -333,18 +367,34 @@ function renderCams(){
 if(navigator.mediaDevices&&navigator.mediaDevices.addEventListener)navigator.mediaDevices.addEventListener('devicechange',()=>{if(stream)listCams()});
 $('#camChips').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;useCam(cams[+b.dataset.i].deviceId)};
 function useCam(id){camId=id;stopCam();startCam()}
+function camSum(){
+  const i=cams.findIndex(d=>d.deviceId===camId),z=$('#zoomRow').hidden?'':' · '+$('#zv').textContent;
+  $('#camSum').textContent=stream?'· '+(i>=0?camName(cams[i],i+1):'กล้องหลัง')+z:'';
+}
 function setupZoom(){
   const t=stream&&stream.getVideoTracks()[0],cap=t&&t.getCapabilities?t.getCapabilities():{},z=$('#zoomRow');
   if(cap.zoom&&cap.zoom.max>cap.zoom.min){
     const r=$('#zoom');r.min=cap.zoom.min;r.max=cap.zoom.max;r.step=cap.zoom.step||0.1;
     r.value=(t.getSettings().zoom)||cap.zoom.min;$('#zv').textContent=(+r.value).toFixed(1)+'x';z.hidden=false;
   }else z.hidden=true;
+  camSum();
 }
 $('#zoom').oninput=async e=>{
   const t=stream&&stream.getVideoTracks()[0];if(!t)return;
-  try{await t.applyConstraints({advanced:[{zoom:+e.target.value}]});$('#zv').textContent=(+e.target.value).toFixed(1)+'x'}catch(_){}
+  try{await t.applyConstraints({advanced:[{zoom:+e.target.value}]});$('#zv').textContent=(+e.target.value).toFixed(1)+'x';camSum()}catch(_){}
 };
-function stopCam(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}vid.srcObject=null;overlay()}
+const gb=$('#gridBtn');gb.classList.toggle('on',gridOn);
+gb.onclick=()=>{gridOn=!gridOn;gb.classList.toggle('on',gridOn);try{localStorage.setItem('shopeeGrid',gridOn?'1':'0')}catch(e){}overlay()};
+function setupTorch(){
+  const t=stream&&stream.getVideoTracks()[0],cap=t&&t.getCapabilities?t.getCapabilities():{};
+  torchOn=false;$('#torchBtn').hidden=!cap.torch;$('#torchBtn').classList.remove('on');
+}
+$('#torchBtn').onclick=async()=>{
+  const t=stream&&stream.getVideoTracks()[0];if(!t)return;
+  try{await t.applyConstraints({advanced:[{torch:!torchOn}]});torchOn=!torchOn;$('#torchBtn').classList.toggle('on',torchOn)}
+  catch(e){toast('กล้องนี้เปิดแฟลชไม่ได้')}
+};
+function stopCam(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}vid.srcObject=null;torchOn=false;$('#torchBtn').classList.remove('on');overlay();camSum()}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopCam();else if(S.act)startCam()});
 $('#flip').onclick=()=>{
   if(cams.length>1){const i=cams.findIndex(d=>d.deviceId===camId);useCam(cams[(i+1)%cams.length].deviceId)}
@@ -367,10 +417,11 @@ function setImg(blob){
   const c=cellById(S.act);if(!c)return;
   const url=URL.createObjectURL(blob),im=new Image();
   im.onload=()=>{
-    c.img=im;c.url=url;place(c);
+    const had=!!c.img;if(c.url&&c.url!==url)URL.revokeObjectURL(c.url);
+    c.img=im;c.url=url;c.blob=blob;place(c);saveImgs();
     const n=S.cells.length;let nx=null;
     for(let k=1;k<=n;k++){const j=S.cells[(S.cells.indexOf(c)+k)%n];if(!j.img){nx=j;break}}
-    if(nx){S.act=nx.id;S.sel={k:'c',id:nx.id}}
+    if(nx){S.act=nx.id;S.sel={k:'c',id:nx.id};if(had)toast('ถ่ายทับช่อง '+(S.cells.indexOf(c)+1)+' แล้ว')}
     else{S.act=null;S.sel=null;toast('ถ่ายครบแล้ว กด “สร้างรูป” ได้เลย')}
     renderSel();overlay();status();
   };
@@ -403,14 +454,14 @@ async function exportImg(){
     }
   });
   S.texts.forEach(t=>{
-    if(t.field&&!t.val)return;
-    const F=FONTS[t.font]||FONTS[0],fs=t.size/100*N,lh=fs*1.2,lines=String(t.field?fieldText(t):t.text).split('\n');
-    x.font=F[1]+' '+fs+'px "'+F[0]+'",sans-serif';x.textAlign='center';x.textBaseline='middle';
+    const tx=txtOf(t);if(t.group&&!tx)return;
+    const F=FONTS[t.font]||FONTS[0],fs=t.size/100*N,lh=fs*1.2,lines=String(tx).split('\n');
+    x.font=F[1]+' '+fs+'px "'+F[0]+'",sans-serif';const al=t.group?t.ax:.5;x.textAlign=al===0?'left':al===1?'right':'center';x.textBaseline='middle';
     const mw=Math.max(0,...lines.map(l=>x.measureText(l).width)),px=t.bg?fs*.5:0,py=t.bg?fs*.25:0;
     const bw=mw+px*2,bh=lines.length*lh+py*2,L=t.x/100*N-t.ax*bw,T=t.y/100*N-t.ay*bh;
     if(t.bg){x.fillStyle=rgba(t.bgc,t.bga);x.beginPath();x.roundRect(L,T,bw,bh,fs*.35);x.fill()}
     lines.forEach((l,i)=>{
-      const cy=T+py+(i+.5)*lh+fs*.04,cx=L+bw/2;
+      const cy=T+py+(i+.5)*lh+fs*.04,cx=al===0?L+px:al===1?L+bw-px:L+bw/2;
       if(t.stroke){x.lineJoin='round';x.lineWidth=fs*.14;x.strokeStyle=contrast(t.color);x.strokeText(l,cx,cy)}
       x.fillStyle=t.color;x.fillText(l,cx,cy);
     });
@@ -421,7 +472,7 @@ $('#exportBtn').onclick=async()=>{
   const btn=$('#exportBtn');btn.disabled=true;
   try{
     const blob=await exportImg(),d=new Date(),p=n=>String(n).padStart(2,'0');
-    const name='shopee-'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds())+'.jpg';
+    const cd=((grp()||{}).code||'').trim().replace(/[^\w\u0E00-\u0E7F-]+/g,'_').slice(0,40),name=cd?cd+'.jpg':'shopee-'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds())+'.jpg';
     const url=URL.createObjectURL(blob),a=document.createElement('a');
     a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),10000);
@@ -429,7 +480,47 @@ $('#exportBtn').onclick=async()=>{
   }catch(e){toast('บันทึกไม่สำเร็จ ลองอีกครั้ง')}
   btn.disabled=false;
 };
-$('#closeModal').onclick=()=>{$('#modal').hidden=true};
+
+/* ---------- keep photos across refresh (IndexedDB) ---------- */
+function idb(){return new Promise((ok,no)=>{const r=indexedDB.open('shopeePhotos',1);r.onupgradeneeded=()=>r.result.createObjectStore('k');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
+async function idbSet(k,v){try{const db=await idb();await new Promise((ok,no)=>{const t=db.transaction('k','readwrite');t.objectStore('k').put(v,k);t.oncomplete=ok;t.onerror=()=>no(t.error)});db.close()}catch(e){}}
+async function idbGet(k){try{const db=await idb();const v=await new Promise((ok,no)=>{const r=db.transaction('k').objectStore('k').get(k);r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});db.close();return v}catch(e){return null}}
+let imgT=0;
+function saveImgs(){clearTimeout(imgT);imgT=setTimeout(()=>idbSet('imgs',S.cells.map(c=>c.blob||null)),150)}
+async function restoreImgs(){
+  const a=await idbGet('imgs');if(!Array.isArray(a))return;
+  let n=0;
+  await Promise.all(S.cells.map((c,i)=>{const b=a[i];if(!b||c.img)return;return new Promise(ok=>{
+    const url=URL.createObjectURL(b),im=new Image();
+    im.onload=()=>{if(!c.img){c.img=im;c.url=url;c.blob=b;n++;place(c)}ok()};
+    im.onerror=()=>{URL.revokeObjectURL(url);ok()};im.src=url})}));
+  if(n){const e=S.cells.find(c=>!c.img);S.act=e?e.id:null;S.sel=e?{k:'c',id:e.id}:null;renderSel();overlay();status();toast('กู้รูปที่ถ่ายไว้คืนแล้ว '+n+' รูป')}
+}
+
+/* ---------- shop profiles ---------- */
+const PK='shopeeProfiles';
+const profs=()=>{try{return JSON.parse(localStorage.getItem(PK)||'{}')||{}}catch(e){return {}}};
+function profWrite(o){try{localStorage.setItem(PK,JSON.stringify(o));return true}catch(e){toast('บันทึกโปรไฟล์ไม่สำเร็จ');return false}}
+function renderProfs(sel){$('#prof').innerHTML='<option value="">— เลือกโปรไฟล์ —</option>'+Object.keys(profs()).map(n=>'<option value="'+esc(n)+'"'+(n===sel?' selected':'')+'>'+esc(n)+'</option>').join('')}
+$('#profSave').onclick=()=>{
+  const cur=$('#prof').value,name=(prompt('ตั้งชื่อโปรไฟล์ (เช่น ชื่อร้าน)',cur)||'').trim();if(!name)return;
+  const o=profs();if(o[name]&&name!==cur&&!confirm('มีโปรไฟล์ชื่อนี้แล้ว ทับเลยไหม?'))return;
+  o[name]={gap:S.gap,bg:S.bg,cells:S.cells.map(c=>({x:c.x,y:c.y,w:c.w,h:c.h,label:c.label})),
+    texts:S.texts.map(t=>{const r={...t};delete r.id;if(r.group){r.chest=r.length=r.code=''}return r})};
+  if(profWrite(o)){renderProfs(name);toast('บันทึกโปรไฟล์ “'+name+'” แล้ว')}
+};
+$('#profLoad').onclick=()=>{
+  const n=$('#prof').value,d=n&&profs()[n];if(!d||!d.cells||!d.cells.length){toast('เลือกโปรไฟล์ก่อน');return}
+  const g=grp(),keep=g?{chest:g.chest,length:g.length,code:g.code}:{};
+  S.gap=Number.isFinite(+d.gap)?clamp(+d.gap,0,6):1.2;S.bg=/^#[0-9a-f]{6}$/i.test(d.bg)?d.bg:'#ffffff';
+  S.cells=d.cells.map((c,k)=>{const m=mk([c.x,c.y,c.w,c.h],S.cells[k]);m.label=c.label||'';return m});
+  S.texts=(d.texts||[]).filter(t=>!t.field).map(normText);ensureFields();Object.assign(grp(),keep);
+  $('#gap').value=S.gap;$('#bg').value=S.bg;stage.style.background=S.bg;
+  const a=S.cells.find(c=>!c.img)||S.cells[0];S.act=a?a.id:null;S.sel=a?{k:'c',id:a.id}:null;
+  renderFields();build();save();saveImgs();toast('ใช้โปรไฟล์ “'+n+'” แล้ว');if(S.act&&!stream)startCam();
+};
+$('#profDel').onclick=()=>{const n=$('#prof').value;if(!n)return;if(!confirm('ลบโปรไฟล์ “'+n+'” ใช่ไหม?'))return;const o=profs();delete o[n];if(profWrite(o))renderProfs('')};
+renderProfs('');
 
 /* ---------- misc ---------- */
 let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2600)}
@@ -440,9 +531,12 @@ function save(){
 function load(){
   try{
     const d=JSON.parse(localStorage.getItem('shopeeCollage2')||'null');
-    if(d&&d.cells&&d.cells.length){S.gap=d.gap;S.bg=d.bg;S.lock=!!d.lock;
+    if(d&&d.cells&&d.cells.length){S.gap=Number.isFinite(+d.gap)?clamp(+d.gap,0,6):1.2;S.bg=/^#[0-9a-f]{6}$/i.test(d.bg)?d.bg:'#ffffff';S.lock=!!d.lock;
       S.cells=d.cells.map(c=>{const m=mk([c.x,c.y,c.w,c.h]);m.label=c.label||'';return m});
-      S.texts=(d.texts||[]).map(normText);return true}
+      const tx=d.texts||[],old=tx.filter(t=>t.field);
+      S.texts=tx.filter(t=>!t.field).map(normText);
+      if(!S.texts.some(t=>t.group)&&old.length){const g=normText(GRP_NEW());old.forEach(t=>{g[t.field]=t.val||''});S.texts.push(g)}
+      return true}
   }catch(e){}
   return false;
 }
@@ -451,7 +545,10 @@ ensureFields();
 S.act=S.cells[0].id;S.sel={k:'c',id:S.act};
 $('#gap').value=S.gap;$('#bg').value=S.bg;stage.style.background=S.bg;
 $('#lockBtn').textContent=S.lock?'ปลดล็อกกรอบ':'ล็อกกรอบ';$('#lockBtn').classList.toggle('on',S.lock);
-renderFields();build();status();startCam();
+const ct=$('#camTools');
+try{ct.open=localStorage.getItem('shopeeCamTools')==='1'}catch(e){}
+ct.addEventListener('toggle',()=>{try{localStorage.setItem('shopeeCamTools',ct.open?'1':'0')}catch(e){}});
+renderFields();build();status();startCam();restoreImgs();
 </script>
 </body>
 </html>
