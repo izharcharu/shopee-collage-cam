@@ -117,6 +117,18 @@ body{font-size:14px}
 #fl input:focus,#fl select:focus{border-color:var(--acc)}
 .sw{width:min(100%,40vh)}
 @supports (height:1dvh){.sw{width:min(100%,40dvh)}}
+
+/* compact product-info row */
+#fl{gap:4px;margin-top:6px}
+#fl .frow{gap:0}
+#fl .fl{font-size:10px;line-height:1.2;padding-left:2px}
+#fl input,#fl select{padding:3px 4px;height:34px;border-radius:10px;font-size:16px}
+#fl input::placeholder{font-size:12px;color:var(--mute);opacity:.6}
+.tabs{margin-top:6px;padding:3px;border-radius:14px}
+.tabs button{padding:7px 4px;font-size:13px}
+.top{margin-bottom:6px}
+.sw{width:min(100%,42vh)}
+@supports (height:1dvh){.sw{width:min(100%,42dvh)}}
 </style>
 </head>
 <body>
